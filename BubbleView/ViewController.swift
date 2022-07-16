@@ -43,7 +43,7 @@ class ViewController: UIViewController {
     
     //MARK: - Function Declaration
     func setupUI() {
-        BubbleTimer = Timer.scheduledTimer(timeInterval: 1.06, target: self, selector: #selector(self.startBubble), userInfo: nil, repeats: true)
+        BubbleTimer = Timer.scheduledTimer(timeInterval: 0.06, target: self, selector: #selector(self.startBubble), userInfo: nil, repeats: true)
     }
     
     @objc private func imdbImageTouchUpInside() {
@@ -79,11 +79,11 @@ extension ViewController{
         }
         let size = self.randomFloatBetweenNumbers(firstNum: 9, secondNum: 40)
         
-        let randomOriginX = self.randomFloatBetweenNumbers(firstNum: self.bubbleButton.frame.minX, secondNum: self.bubbleButton.frame.maxX)
-        let originy = self.view.frame.maxY
+        let randomOriginX = self.randomFloatBetweenNumbers(firstNum: self.view.frame.minX, secondNum: self.view.frame.maxX)
+        let originy = self.view.frame.maxY - 35
         
         
-        bubbleImageView.frame = CGRect(x: randomOriginX, y: 0, width: CGFloat(size), height: CGFloat(size))
+        bubbleImageView.frame = CGRect(x: randomOriginX, y: originy, width: CGFloat(size), height: CGFloat(size))
         bubbleImageView.alpha = self.randomFloatBetweenNumbers(firstNum: 0.0, secondNum: 1.0)
         bubbleImageView.layer.cornerRadius = bubbleImageView.frame.size.height / 2
         bubbleImageView.clipsToBounds = true
@@ -91,9 +91,9 @@ extension ViewController{
         
         let zigzagPath: UIBezierPath = UIBezierPath()
         let oX: CGFloat = bubbleImageView.frame.origin.x
-        let oY: CGFloat = bubbleButton.frame.origin.y
+        let oY: CGFloat = bubbleImageView.frame.origin.y
         let eX: CGFloat = oX
-        let eY: CGFloat = oY - (self.randomFloatBetweenNumbers(firstNum: self.bubbleButton.frame.midY, secondNum: self.bubbleButton.frame.maxY))
+        let eY: CGFloat = oY - (self.randomFloatBetweenNumbers(firstNum: self.view.frame.midY, secondNum: self.view.frame.maxY))
         let t = self.randomFloatBetweenNumbers(firstNum: 20, secondNum: 100)
         var cp1 = CGPoint(x: oX - t, y: ((oY + eY) / 2))
         var cp2 = CGPoint(x: oX + t, y: cp1.y)
@@ -107,11 +107,11 @@ extension ViewController{
         
         zigzagPath.move(to: CGPoint(x: oX, y: oY))
         
-        zigzagPath.addCurve(to: CGPoint(x: eX, y: 400), controlPoint1: cp1, controlPoint2: cp2)
+        zigzagPath.addCurve(to: CGPoint(x: eX, y: eY), controlPoint1: cp1, controlPoint2: cp2)
         CATransaction.begin()
         CATransaction.setCompletionBlock({() -> Void in
             
-            UIView.transition(with: bubbleImageView, duration: 0.01, options: .curveEaseInOut, animations: {() -> Void in
+            UIView.transition(with: bubbleImageView, duration: 0.1, options: .transitionCrossDissolve, animations: {() -> Void in
                 bubbleImageView.transform = CGAffineTransform(scaleX: 1.3, y: 1.3)
             }, completion: {(_ finished: Bool) -> Void in
                 bubbleImageView.removeFromSuperview()
@@ -119,7 +119,7 @@ extension ViewController{
         })
         
         let pathAnimation = CAKeyframeAnimation(keyPath: "position")
-        pathAnimation.duration = 2.5
+        pathAnimation.duration = 3.5
         pathAnimation.path = zigzagPath.cgPath
         
         pathAnimation.fillMode = CAMediaTimingFillMode.forwards
